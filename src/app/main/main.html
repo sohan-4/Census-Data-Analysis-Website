@@ -1,16 +1,21 @@
-<html>
-    <head>
-        <title>Census Data Analyzer</title>
-    </head>
-    <body>
-        <header class="main-header">
-            <h1>Census Data Analyzer</h1>
-        </header>
-        <div class="map">
-            <!-- Insert map here -->
+<div class="background">
+    <header class="main-header">
+        <h1>Census Data Analyzer</h1>
+    </header>
+
+    <div class="dashboard-grid">
+        
+        <div class="card map-card">
+            <h2>US Population Map</h2>
+            <div #mapContainer class="map-container"></div>
         </div>
-        <div class="data">
-            <!-- Insert Data here -->
+
+        <div class="card data-card">
+            <h2>State Details</h2>
+            <div class="data-content">
+                <p>Select a state to view census data.</p>
+                </div>
         </div>
-    </body>
-</html>
+
+    </div>
+</div>
