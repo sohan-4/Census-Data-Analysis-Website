@@ -1,11 +1,10 @@
-/* main.css */
 
 .background {
     display: flex;
     justify-content: flex-start; 
     align-items: center;
     flex-direction: column;
-    background-color: rgb(15, 15, 100);
+    background-color: #121212;  
     height: 100vh;
     width: 100vw;
     padding-top: 2rem; 
@@ -13,7 +12,7 @@
 }
 
 .main-header {
-    color: white;
+    color: #e0e0e0;
     text-align: center;
     width: 100%; 
 }
@@ -27,14 +26,25 @@
     gap: 20px;
 }
 
+.card {
+    background: #1e1e1e; 
+    color: #e0e0e0;
+    border: 1px solid #333;
+    border-radius: 8px;
+}
+
 .map-card {
     flex: 3;
-    background: white;
-    border-radius: 8px;
     padding: 10px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+
+.data-card {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
 }
 
 .map-container {
@@ -44,9 +54,7 @@
     min-height: 0; 
 }
 
-.data-card {
-    flex: 1;
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
+h2 {
+    color: #ffffff;
+    margin-top: 0;
 }
