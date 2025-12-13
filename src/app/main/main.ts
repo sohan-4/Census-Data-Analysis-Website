@@ -4,6 +4,22 @@ import { Census } from '../census';
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 
+const THEME_LIGHT = {
+    default: "#d1d5db",
+    hover: "#ff9800",
+    flash: "#ff0000",
+    selected: "#00e676",
+    stroke: "#ffffff"
+};
+
+const THEME_DARK = {
+    default: "#374151",
+    hover: "#ff9800",
+    flash: "#ff0000",
+    selected: "#00e676",
+    stroke: "#6b7280"
+};
+
 @Component({
   selector: 'app-main',
   standalone: true,
@@ -16,6 +32,9 @@ export class Main implements AfterViewInit {
   
   selectedStateInfo: string = "Select a state to view census data.";
   selectedStateId: string | null = null;
+  
+  isDarkMode: boolean = true; 
+  currentTheme = THEME_DARK;
 
   private censusService = inject(Census); 
   
@@ -23,6 +42,28 @@ export class Main implements AfterViewInit {
 
   ngAfterViewInit() {
     this.createMap();
+  }
+
+  toggleTheme() {
+    this.isDarkMode = !this.isDarkMode;
+    this.currentTheme = this.isDarkMode ? THEME_DARK : THEME_LIGHT;
+    this.updateMapColors();
+  }
+
+  updateMapColors() {
+    const svg = d3.select(this.mapContainer.nativeElement).select('svg');
+    const paths = svg.selectAll('path.state-path');
+    const borders = svg.selectAll('path.mesh-border');
+
+    paths.attr("stroke", this.currentTheme.stroke);
+    borders.attr("stroke", this.currentTheme.stroke);
+
+    paths.transition().duration(300)
+         .attr("fill", (d: any) => {
+             return d.id === this.selectedStateId 
+                 ? this.currentTheme.selected 
+                 : this.currentTheme.default;
+         });
   }
 
   async createMap() {
@@ -48,60 +89,51 @@ export class Main implements AfterViewInit {
     const projection = d3.geoAlbersUsa().fitSize([width, height], states);
     const path = d3.geoPath().projection(projection);
 
-    // --- DARK MODE COLORS ---
-    const COLOR_DEFAULT  = "#374151";
-    const COLOR_BORDER   = "#6b7280";
-    const COLOR_HOVER    = "#ff9800";
-    const COLOR_FLASH    = "#ff0000";
-    const COLOR_SELECTED = "#00e676";
-
     const paths = svg.append("g")
       .selectAll("path")
       .data((states as any).features)
       .join("path")
       .attr("d", path as any)
       .attr("class", "state-path")
-      .attr("stroke", COLOR_BORDER)
+      .attr("stroke", this.currentTheme.stroke)
       .attr("stroke-width", 1)
       .style("cursor", "pointer")
-      .attr("fill", COLOR_DEFAULT);
+      .attr("fill", this.currentTheme.default);
     
     paths
-      .on("mouseover", function(event, d: any) {
-        d3.select(this)
+      .on("mouseover", (event, d: any) => {
+        d3.select(event.currentTarget)
           .interrupt() 
           .transition().duration(200)
-          .attr("fill", COLOR_HOVER);
+          .attr("fill", this.currentTheme.hover);
       })
       .on("mouseout", (event, d: any) => {
         const isSelected = this.selectedStateId === d.id;
-        
         d3.select(event.currentTarget)
           .transition().duration(200)
-          .attr("fill", isSelected ? COLOR_SELECTED : COLOR_DEFAULT);
+          .attr("fill", isSelected ? this.currentTheme.selected : this.currentTheme.default);
       })
       .on("click", (event, d: any) => {
         this.selectedStateId = d.id;
-
+        
         paths.filter((node: any) => node.id !== d.id)
              .transition().duration(200)
-             .attr("fill", COLOR_DEFAULT);
+             .attr("fill", this.currentTheme.default);
 
         d3.select(event.currentTarget)
           .interrupt()
-          .attr("fill", COLOR_FLASH)
+          .attr("fill", this.currentTheme.flash)
           .transition().duration(650)
-          .attr("fill", COLOR_SELECTED);
+          .attr("fill", this.currentTheme.selected);
 
         const stateName = this.censusService.getStateName(d.id);
         const data = stateDataMap.get(stateName);
 
         if (data) {
             const getPct = (n: number) => ((n / data.population) * 100).toFixed(1) + '%';
-            
             this.selectedStateInfo = `
               <div style="text-align: left;">
-                <h2 style="margin-bottom: 10px; border-bottom: 2px solid #555;">${data.name}</h2>
+                <h2 style="margin-bottom: 10px;">${data.name}</h2>
                 <p><strong>Population:</strong> ${data.population.toLocaleString()}</p>
                 <p><strong>Median Income:</strong> $${data.medianIncome.toLocaleString()}</p>
                 <br>
@@ -123,8 +155,9 @@ export class Main implements AfterViewInit {
 
     svg.append("path")
       .datum(topojson.mesh(us, us.objects.states as any, (a, b) => a !== b))
+      .attr("class", "mesh-border")
       .attr("fill", "none")
-      .attr("stroke", COLOR_BORDER)
+      .attr("stroke", this.currentTheme.stroke)
       .attr("stroke-linejoin", "round")
       .attr("d", path as any);
   }

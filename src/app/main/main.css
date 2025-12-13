@@ -1,25 +1,80 @@
+:root {
+    --bg-color: rgb(15, 15, 100);
+    --card-bg: white;
+    --text-color: #333;
+    --header-text: white;
+    --border-color: #ddd;
+    --heading-border: #ddd;
+}
+
+.dark-theme {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --header-text: #e0e0e0;
+    --border-color: #333;
+    --heading-border: #555;
+}
 
 .background {
     display: flex;
     justify-content: flex-start; 
     align-items: center;
     flex-direction: column;
-    background-color: #121212;  
+    background-color: var(--bg-color);
+    
+    /* FIX 1: Ensure padding doesn't add to width/height */
+    box-sizing: border-box;
+    
     height: 100vh;
     width: 100vw;
-    padding-top: 2rem; 
+    
+    padding-top: 2rem;
+    
+    /* FIX 2: Add the requested bottom gap */
+    padding-bottom: 1rem; 
+    
     gap: 2rem;
+    transition: background-color 0.3s ease;
+    
+    /* Optional: prevents scrollbars if the header is slightly too tall */
+    overflow: hidden; 
 }
 
 .main-header {
-    color: #e0e0e0;
+    color: var(--header-text);
     text-align: center;
     width: 100%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    
+    /* Give the header a flexible shrinkage so it doesn't fight the map */
+    flex-shrink: 0;
+}
+
+.theme-btn {
+    padding: 8px 16px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.theme-btn:hover {
+    transform: scale(1.05);
 }
 
 .dashboard-grid {
     width: 90vw;
-    height: 85vh; 
+    
+    /* FIX 3: Reduced from 85vh to 80vh to create room for the bottom gap */
+    height: 80vh; 
+    
     display: flex;
     justify-content: center;
     align-items: stretch;
@@ -27,10 +82,11 @@
 }
 
 .card {
-    background: #1e1e1e; 
-    color: #e0e0e0;
-    border: 1px solid #333;
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .map-card {
@@ -55,6 +111,8 @@
 }
 
 h2 {
-    color: #ffffff;
     margin-top: 0;
+    border-bottom: 2px solid var(--heading-border) !important;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
 }

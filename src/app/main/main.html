@@ -1,6 +1,9 @@
-<div class="background">
+<div class="background" [class.dark-theme]="isDarkMode">
     <header class="main-header">
         <h1>Census Data Analyzer</h1>
+        <button class="theme-btn" (click)="toggleTheme()">
+            Switch to {{ isDarkMode ? 'Light' : 'Dark' }} Mode
+        </button>
     </header>
 
     <div class="dashboard-grid">
