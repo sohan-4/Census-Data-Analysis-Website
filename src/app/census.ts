@@ -1,36 +1,26 @@
 import { Injectable } from '@angular/core';
 
-export interface StateData {
-  name: string;
-  population: number;
-  medianIncome: number;
-  demographics: {
-    white: number;
-    black: number;
-    asian: number;
-    hispanic: number;
-    other: number;
-  };
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class Census {
 
+  // FIPS Code -> State Name map
   private fipsMap: { [key: string]: string } = { "01": "Alabama", "02": "Alaska", "04": "Arizona", "05": "Arkansas", "06": "California", "08": "Colorado", "09": "Connecticut", "10": "Delaware", "11": "District of Columbia", "12": "Florida", "13": "Georgia", "15": "Hawaii", "16": "Idaho", "17": "Illinois", "18": "Indiana", "19": "Iowa", "20": "Kansas", "21": "Kentucky", "22": "Louisiana", "23": "Maine", "24": "Maryland", "25": "Massachusetts", "26": "Michigan", "27": "Minnesota", "28": "Mississippi", "29": "Missouri", "30": "Montana", "31": "Nebraska", "32": "Nevada", "33": "New Hampshire", "34": "New Jersey", "35": "New Mexico", "36": "New York", "37": "North Carolina", "38": "North Dakota", "39": "Ohio", "40": "Oklahoma", "41": "Oregon", "42": "Pennsylvania", "44": "Rhode Island", "45": "South Carolina", "46": "South Dakota", "47": "Tennessee", "48": "Texas", "49": "Utah", "50": "Vermont", "51": "Virginia", "53": "Washington", "54": "West Virginia", "55": "Wisconsin", "56": "Wyoming", "72": "Puerto Rico" };
 
   constructor() { }
 
-  async getCensusData(): Promise<Map<string, StateData>> {
+  // Changed return type to Promise<Map<string, any>>
+  async getCensusData(): Promise<Map<string, any>> {
+    // Define the Variables
     const variables = [
       'NAME',
-      'B19013_001E',
-      'B01003_001E',
-      'B03002_003E', 
-      'B03002_004E', 
-      'B03002_006E', 
-      'B03002_012E'
+      'B19013_001E', // Median Income
+      'B01003_001E', // Population
+      'B03002_003E', // White
+      'B03002_004E', // Black
+      'B03002_006E', // Asian
+      'B03002_012E'  // Hispanic
     ].join(',');
 
     const url = `https://api.census.gov/data/2020/acs/acs5?get=${variables}&for=state:*`;
@@ -38,7 +28,10 @@ export class Census {
     const response = await fetch(url);
     const data = await response.json();
     
-    const dataMap = new Map<string, StateData>();
+    // Changed Map type to <string, any>
+    const dataMap = new Map<string, any>();
+
+    // Skip header row (index 0)
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const name = row[0];
